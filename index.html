@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fanfic Prompt Maker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Merriweather:ital,wght@0,300;0,400;1,300&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="./index.css">
+  <script type="module" src="./app.js" defer></script>
+</head>
+
+<body>
+
+  <div id="app">
+
+    <!-- ══════════════════════════════ -->
+    <!-- API KEY OVERLAY (Blocks App)  -->
+    <!-- ══════════════════════════════ -->
+    <div id="apiKeyOverlay" class="overlay active">
+      <div class="modal">
+        <h2>Fanfic Prompt Maker</h2>
+        <p>Your interactive prompt engineer for fanfiction. Fine-tune your idea through chat, then get a master prompt.</p>
+
+        <div id="savedKeysBlock" class="saved-keys-block" style="display:none;">
+          <label>Use a Saved Key</label>
+          <select id="selectSavedKey"></select>
+          <button id="btnUseSavedKey" style="margin-bottom:1rem; width:100%;">Continue →</button>
+          <div class="divider">or add a new key</div>
+        </div>
+
+        <div id="apiKeyError" class="error-message"></div>
+        <label>Google Gemini API Key</label>
+        <input type="password" id="newApiKeyInput" placeholder="AIzaSy..." autocomplete="off">
+        <label>Key Name (optional)</label>
+        <input type="text" id="newApiKeyName" placeholder="My Key">
+        <button id="btnSaveApiKey" style="width:100%;">Save & Continue →</button>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════ -->
+    <!-- SIDEBAR                       -->
+    <!-- ══════════════════════════════ -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h3>Chats</h3>
+        <button id="btnNewSession" class="icon-btn" title="New Session">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        </button>
+      </div>
+      
+      <div class="sidebar-content">
+        <div class="sidebar-section">
+          <h4>Pinned</h4>
+          <div id="pinnedSessionsList" class="session-list"></div>
+        </div>
+        <div class="sidebar-section">
+          <h4>Recent</h4>
+          <div id="recentSessionsList" class="session-list"></div>
+        </div>
+      </div>
+
+      <div class="sidebar-footer">
+        <button id="btnOpenSettings" class="settings-btn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+          Settings
+        </button>
+      </div>
+    </aside>
+
+    <!-- ══════════════════════════════ -->
+    <!-- MAIN CHAT AREA                -->
+    <!-- ══════════════════════════════ -->
+    <main class="chat-area">
+      <header class="chat-header">
+        <input type="text" id="sessionNameInput" class="invisible-input" value="Session Name">
+        <button id="btnTogglePin" class="icon-btn" title="Toggle Pin">📌</button>
+      </header>
+
+      <div class="chat-history" id="chatHistory">
+        <!-- Bubbles injected via JS -->
+      </div>
+
+      <!-- Dock (where intent is typed) -->
+      <div class="chat-dock" id="chatDock" style="display:none;">
+        <div class="dock-container">
+          <div class="attachment-bar" id="attachmentBar" style="display:none;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+            <span id="attachedFileName"></span>
+            <button id="btnRemoveAttachment" title="Remove attachment">✕</button>
+          </div>
+          
+          <div id="dockError" class="error-message" style="margin-bottom:0.5rem; display:none;"></div>
+          
+          <div class="input-row">
+            <input type="file" id="fileInput" accept=".pdf,.docx,.txt,.md" style="display:none;">
+            <button class="icon-btn clip-btn" id="btnAttach" title="Attach Context File (PDF, DOCX, TXT)">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg>
+            </button>
+            <textarea id="intentInput" placeholder="Describe the fanfic you want to write..."></textarea>
+            <button class="send-btn" id="btnSendIntent">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+            </button>
+          </div>
+          <div class="edit-mode-indicator" id="editModeIndicator" style="display:none;">
+            You are editing your intent. Sending will restart the Q&A process.
+          </div>
+        </div>
+      </div>
+    </main>
+
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- SETTINGS MODAL OVERLAY                                -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div id="settingsOverlay" class="overlay">
+    <div class="settings-panel">
+      <div class="settings-header">
+        <h2>Settings</h2>
+        <button id="btnSettingsClose" class="settings-close" title="Close">&times;</button>
+      </div>
+
+      <div class="settings-body">
+        <!-- API KEY MANAGER -->
+        <div class="settings-section">
+          <h3>API Keys</h3>
+          <div class="api-key-list" id="apiKeyManagerList"></div>
+          <button id="btnShowAddKeyForm" class="secondary" style="width:100%; margin-bottom:0.5rem;">+ Add New Key</button>
+          
+          <div id="addKeyForm" class="add-key-form">
+            <label>Key Name</label>
+            <input type="text" id="addKeyName" placeholder='e.g. "My Personal Key"'>
+            <label>API Key</label>
+            <input type="password" id="addKeyValue" placeholder="AIzaSy...">
+            <div class="form-buttons">
+              <button id="btnSaveNewKey" class="small">Save</button>
+              <button id="btnCancelAddKey" class="secondary small">Cancel</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- THEME PICKER -->
+        <div class="settings-section">
+          <h3>Theme</h3>
+          <div class="theme-grid">
+            <div class="theme-card" id="themeCard-ao3" data-theme="ao3">
+              <div class="theme-preview ao3-preview">
+                <div class="preview-header"></div>
+                <div class="preview-body"></div>
+              </div>
+              <div class="theme-name">AO3</div>
+            </div>
+            <div class="theme-card" id="themeCard-modern" data-theme="modern">
+              <div class="theme-preview modern-preview">
+                <div class="preview-header"></div>
+                <div class="preview-body"></div>
+              </div>
+              <div class="theme-name">Wattpad</div>
+            </div>
+            <div class="theme-card" id="themeCard-ffn" data-theme="ffn">
+              <div class="theme-preview ffn-preview">
+                <div class="preview-header"></div>
+                <div class="preview-body"></div>
+              </div>
+              <div class="theme-name">FFN Blue</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CUSTOM COLORS -->
+        <div class="settings-section">
+          <h3>Custom Colors</h3>
+          <div class="color-grid">
+            <div class="color-picker-item"><label>Page Background</label><input type="color" data-var="--bg-color"></div>
+            <div class="color-picker-item"><label>Card Surface</label><input type="color" data-var="--surface-color"></div>
+            <div class="color-picker-item"><label>Accent / Buttons</label><input type="color" data-var="--accent-color"></div>
+            <div class="color-picker-item"><label>Button Text</label><input type="color" data-var="--btn-text"></div>
+            <div class="color-picker-item"><label>Primary Text</label><input type="color" data-var="--text-primary"></div>
+            <div class="color-picker-item"><label>Secondary Text</label><input type="color" data-var="--text-secondary"></div>
+            <div class="color-picker-item"><label>Border</label><input type="color" data-var="--border-color"></div>
+            <div class="color-picker-item"><label>Input Background</label><input type="color" data-var="--input-bg"></div>
+          </div>
+        </div>
+
+        <!-- GEMINI MODEL -->
+        <div class="settings-section">
+          <h3>Gemini Model</h3>
+          <label>Model to use for generation</label>
+          <select id="modelSelect">
+            <option value="gemini-2.5-flash">gemini-2.5-flash (Latest · Recommended)</option>
+            <option value="gemini-2.5-pro">gemini-2.5-pro (Most Capable)</option>
+            <option value="gemini-2.0-flash">gemini-2.0-flash (Stable)</option>
+            <option value="gemini-2.0-flash-lite">gemini-2.0-flash-lite (Fastest / Lowest Cost)</option>
+            <option value="gemini-1.5-pro">gemini-1.5-pro (Legacy Pro)</option>
+            <option value="gemini-1.5-flash">gemini-1.5-flash (Legacy Flash)</option>
+          </select>
+        </div>
+
+        <!-- WRITING STYLE TOGGLES -->
+        <div class="settings-section">
+          <h3>Writing Style Directives</h3>
+          <div class="checkbox-list" id="styleCheckboxes">
+            <label><input type="checkbox" name="styleDirective" value="onomatopoeia"> Onomatopoeic Dialogue</label>
+            <label><input type="checkbox" name="styleDirective" value="sensory"> Vivid Sensory Description</label>
+            <label><input type="checkbox" name="styleDirective" value="internalThinks"> Inward Thinking / Monologue</label>
+            <label><input type="checkbox" name="styleDirective" value="paragraphVariety"> Paragraph Variety</label>
+            <label><input type="checkbox" name="styleDirective" value="characterAccuracy"> Character Voice Accuracy</label>
+            <label><input type="checkbox" name="styleDirective" value="dialogueHeavy"> Dialogue-Heavy Scene</label>
+            <label><input type="checkbox" name="styleDirective" value="emotionalDepth"> Emotional Depth</label>
+            <label><input type="checkbox" name="styleDirective" value="continuity"> Scene Continuity Cue</label>
+          </div>
+        </div>
+
+        <!-- PROMPT LENGTH -->
+        <div class="settings-section">
+          <h3>Prompt Detail Level</h3>
+          <div class="radio-list">
+            <label><input type="radio" name="promptLength" value="concise"> Concise — quick, to the point</label>
+            <label><input type="radio" name="promptLength" value="standard"> Standard — balanced (recommended)</label>
+            <label><input type="radio" name="promptLength" value="detailed"> Detailed — maximum context</label>
+          </div>
+        </div>
+
+        <!-- POV MODE -->
+        <div class="settings-section">
+          <h3>Point of View</h3>
+          <div class="radio-list">
+            <label><input type="radio" name="povMode" value="firstPerson"> First Person (I saw, I thought)</label>
+            <label><input type="radio" name="povMode" value="thirdLimited"> Third Person Limited</label>
+            <label><input type="radio" name="povMode" value="thirdOmniscient"> Third Person Omniscient</label>
+          </div>
+        </div>
+
+        <div class="settings-section">
+          <h3>Tone Hints (Optional)</h3>
+          <input type="text" id="toneHintsInput" placeholder="e.g. slow burn, melancholic, hopeful ending...">
+        </div>
+        
+        <button id="btnResetSettings" class="danger" style="width:100%; padding:0.8rem;">Reset All to Defaults</button>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>
