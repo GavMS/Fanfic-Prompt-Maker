@@ -125,7 +125,7 @@ function renderSidebar() {
       <div class="session-name" title="${escHtml(sess.name)}">${escHtml(sess.name)}</div>
       <div class="session-actions">
         <button class="icon-btn btn-pin" title="Pin / Unpin">${sess.pinned ? '📌' : '📍'}</button>
-        <button class="icon-btn btn-del" title="Delete">🗑️</button>
+        <button class="icon-btn btn-del" title="Delete">X</button>
       </div>
     `;
     
