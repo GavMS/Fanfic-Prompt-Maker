@@ -190,29 +190,61 @@ function renderSidebar() {
 // ============================================================
 // PROMPT RESULT PANEL (bottom drawer)
 // ============================================================
-let promptPanelOpen = false;
 let currentPromptIndex = 0; // which generation is currently shown in the panel
+
+function emptyPromptPanel() {
+  const panel = document.getElementById('promptResultPanel');
+  if(!panel) return;
+  panel.querySelector('.prompt-panel-header').innerHTML = `
+    <div class="prompt-panel-title">
+      <span>✨ Generated Prompt</span>
+    </div>
+  `;
+  panel.querySelector('.prompt-panel-body').innerHTML = `
+    <div style="color: var(--text-secondary); font-style: italic; display: flex; align-items: center; justify-content: center; height: 100%; font-family: var(--font-body);">
+      Waiting for prompt generation...
+    </div>
+  `;
+  panel.querySelector('.prompt-panel-footer').innerHTML = '';
+}
+
+function generatingPromptPanel() {
+  const panel = document.getElementById('promptResultPanel');
+  if(!panel) return;
+  panel.querySelector('.prompt-panel-header').innerHTML = `
+    <div class="prompt-panel-title">
+      <span>✨ Generated Prompt</span>
+    </div>
+  `;
+  panel.querySelector('.prompt-panel-body').innerHTML = `
+    <div class="generating-indicator" style="justify-content: center; height: 100%;">
+      <div class="gen-spinner"></div>
+      <span>Generating your Master Prompt…</span>
+    </div>
+  `;
+  panel.querySelector('.prompt-panel-footer').innerHTML = '';
+}
 
 function openPromptPanel(sessionId, idx) {
   const s = sessions.find(s => s.id === sessionId);
-  if (!s || !s.promptHistory.length) return;
+  if (!s) return;
 
-  currentPromptIndex = idx ?? (s.promptHistory.length - 1);
-  promptPanelOpen = true;
+  if (s.status === 'generating_prompt') {
+    generatingPromptPanel();
+    return;
+  }
+
+  if (!s.promptHistory || !s.promptHistory.length) {
+    emptyPromptPanel();
+    return;
+  }
+
+  currentPromptIndex = idx !== undefined ? idx : (s.promptHistory.length - 1);
   renderPromptPanel(s);
-
-  const panel = document.getElementById('promptResultPanel');
-  const overlay = document.getElementById('promptPanelOverlay');
-  panel.classList.add('open');
-  overlay.classList.add('active-overlay');
 }
 
 function closePromptPanel() {
-  promptPanelOpen = false;
-  const panel = document.getElementById('promptResultPanel');
-  const overlay = document.getElementById('promptPanelOverlay');
-  if (panel) panel.classList.remove('open');
-  if (overlay) overlay.classList.remove('active-overlay');
+  // No-op now since it's always open
 }
 
 function renderPromptPanel(s) {
@@ -240,7 +272,6 @@ function renderPromptPanel(s) {
         ${date ? `<span class="pp-date">${date}</span>` : ''}
       </span>
     </div>
-    <button class="icon-btn" id="btnClosePanel" title="Close">✕</button>
   `;
 
   panel.querySelector('.prompt-panel-body').textContent = entry.prompt;
@@ -262,7 +293,6 @@ function renderPromptPanel(s) {
   `;
 
   // Bind events
-  document.getElementById('btnClosePanel').addEventListener('click', closePromptPanel);
   document.getElementById('btnCopyPromptPanel').addEventListener('click', (e) => {
     navigator.clipboard.writeText(entry.prompt).then(() => {
       e.target.textContent = '✅ Copied!';
@@ -328,6 +358,9 @@ async function regeneratePrompt(sessionId, modelId) {
 function renderChat() {
   const s = getActiveSession();
   if (!s) return;
+
+  // Sync bottom panel
+  openPromptPanel(s.id);
 
   const titleInput = document.getElementById('sessionNameInput');
   titleInput.value = s.name;
@@ -519,10 +552,7 @@ function renderChat() {
 
     scrollToBottom();
 
-    // Auto-open the panel for the latest prompt if not already open
-    if (!promptPanelOpen) {
-      setTimeout(() => openPromptPanel(s.id, s.promptHistory.length - 1), 350);
-    }
+
   }
 }
 
@@ -596,9 +626,8 @@ async function submitAnswer(ansText) {
   const currQ = s.questions[s.qaAnswers.length];
   s.qaAnswers.push({ question: currQ.question, answer: ansText });
   s.updatedAt = Date.now();
-  saveSessions(); renderChat();
 
-  if (s.qaAnswers.length === s.questions.length) {
+  if (s.qaAnswers.length >= s.questions.length) {
     s.status = 'generating_prompt';
     saveSessions(); renderChat();
 
@@ -629,6 +658,8 @@ async function submitAnswer(ansText) {
       saveSessions(); renderChat();
       alert("Failed to build prompt: " + e.message);
     }
+  } else {
+    saveSessions(); renderChat();
   }
 }
 
@@ -779,8 +810,7 @@ function bindEvents() {
     ss('fpm_settings', defaultSettings()); syncSettingsUI(); rebuildGemini();
   });
 
-  // Close prompt panel on overlay click
-  document.getElementById('promptPanelOverlay').addEventListener('click', closePromptPanel);
+
 }
 
 // Utils
