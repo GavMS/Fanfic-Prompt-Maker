@@ -598,7 +598,7 @@ async function submitAnswer(ansText) {
   s.updatedAt = Date.now();
   saveSessions(); renderChat();
 
-  if (s.qaAnswers.length === 5) {
+  if (s.qaAnswers.length === s.questions.length) {
     s.status = 'generating_prompt';
     saveSessions(); renderChat();
 
