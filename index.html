@@ -38,7 +38,7 @@
         <input type="password" id="newApiKeyInput" placeholder="AIzaSy..." autocomplete="off">
         <label>Key Name (optional)</label>
         <input type="text" id="newApiKeyName" placeholder="My Key">
-        <button id="btnSaveApiKey" style="width:100%;">Save & Continue →</button>
+        <button id="btnSaveApiKey" style="width:100%;">Save &amp; Continue →</button>
       </div>
     </div>
 
@@ -47,12 +47,15 @@
     <!-- ══════════════════════════════ -->
     <aside class="sidebar">
       <div class="sidebar-header">
-        <h3>Chats</h3>
+        <div class="app-branding">
+          <h3>Fanfic Prompt Maker</h3>
+          <span class="version-badge">v1.0.0</span>
+        </div>
         <button id="btnNewSession" class="icon-btn" title="New Session">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
         </button>
       </div>
-      
+
       <div class="sidebar-content">
         <div class="sidebar-section">
           <h4>Pinned</h4>
@@ -93,26 +96,36 @@
             <span id="attachedFileName"></span>
             <button id="btnRemoveAttachment" title="Remove attachment">✕</button>
           </div>
-          
+
           <div id="dockError" class="error-message" style="margin-bottom:0.5rem; display:none;"></div>
-          
+
           <div class="input-row">
             <input type="file" id="fileInput" accept=".pdf,.docx,.txt,.md" style="display:none;">
             <button class="icon-btn clip-btn" id="btnAttach" title="Attach Context File (PDF, DOCX, TXT)">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg>
             </button>
-            <textarea id="intentInput" placeholder="Describe the fanfic you want to write..."></textarea>
+            <textarea id="intentInput" placeholder="Describe the fanfic you want to write…" rows="1"></textarea>
             <button class="send-btn" id="btnSendIntent">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
             </button>
           </div>
           <div class="edit-mode-indicator" id="editModeIndicator" style="display:none;">
-            You are editing your intent. Sending will restart the Q&A process.
+            You are editing your intent. Sending will restart the Q&amp;A process.
           </div>
         </div>
       </div>
     </main>
 
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- PROMPT RESULT PANEL (Bottom Drawer)                   -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div id="promptPanelOverlay" class="prompt-panel-overlay"></div>
+  <div id="promptResultPanel" class="prompt-result-panel">
+    <div class="prompt-panel-header"></div>
+    <div class="prompt-panel-body"></div>
+    <div class="prompt-panel-footer"></div>
   </div>
 
   <!-- ══════════════════════════════════════════════════════ -->
@@ -131,7 +144,7 @@
           <h3>API Keys</h3>
           <div class="api-key-list" id="apiKeyManagerList"></div>
           <button id="btnShowAddKeyForm" class="secondary" style="width:100%; margin-bottom:0.5rem;">+ Add New Key</button>
-          
+
           <div id="addKeyForm" class="add-key-form">
             <label>Key Name</label>
             <input type="text" id="addKeyName" placeholder='e.g. "My Personal Key"'>
@@ -190,13 +203,11 @@
         <!-- GEMINI MODEL -->
         <div class="settings-section">
           <h3>Gemini Model</h3>
-          <label>Model to use for generation</label>
+          <label>Default model for generation</label>
           <select id="modelSelect">
-            <option value="gemini-3-flash-preview">gemini-3-flash-preview (Next-Gen Fast Preview)</option>
-            <option value="gemini-3.1-flash-lite-preview">gemini-3.1-flash-lite-preview (Ultra-Fast Preview)</option>
             <option value="gemini-2.5-pro">gemini-2.5-pro (Most Capable)</option>
-            <option value="gemini-2.5-flash" selected>gemini-2.5-flash (Latest · Recommended)</option>
-            <option value="gemini-2.5-flash-lite">gemini-2.5-flash-lite (Fastest / Lowest Cost)</option>
+            <option value="gemini-2.5-flash" selected>gemini-2.5-flash (Recommended)</option>
+            <option value="gemini-2.5-flash-lite">gemini-2.5-flash-lite (Fastest)</option>
             <option value="gemini-2.0-flash">gemini-2.0-flash (Stable)</option>
             <option value="gemini-2.0-flash-lite">gemini-2.0-flash-lite (Stable Fast)</option>
             <option value="gemini-1.5-pro">gemini-1.5-pro (Legacy Pro)</option>
@@ -241,9 +252,9 @@
 
         <div class="settings-section">
           <h3>Tone Hints (Optional)</h3>
-          <input type="text" id="toneHintsInput" placeholder="e.g. slow burn, melancholic, hopeful ending...">
+          <input type="text" id="toneHintsInput" placeholder="e.g. slow burn, melancholic, hopeful ending…">
         </div>
-        
+
         <button id="btnResetSettings" class="danger" style="width:100%; padding:0.8rem;">Reset All to Defaults</button>
       </div>
     </div>
