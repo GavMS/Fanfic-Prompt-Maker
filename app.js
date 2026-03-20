@@ -50,6 +50,8 @@ let currentSessionId = null;
 let sessions = [];
 let pendingContextText = '';
 let isEditingIntent = false;
+let sidebarCollapsed = false;
+let panelCollapsed = false;
 
 // ============================================================
 // STORAGE HELPERS
@@ -130,6 +132,11 @@ function switchSession(id) {
   saveSessions();
   renderSidebar();
   renderChat();
+
+  if (window.innerWidth <= 768) {
+    sidebarCollapsed = true;
+    document.querySelector('.sidebar').classList.add('collapsed');
+  }
 }
 
 function deleteSession(id) {
@@ -199,6 +206,7 @@ function emptyPromptPanel() {
     <div class="prompt-panel-title">
       <span>✨ Generated Prompt</span>
     </div>
+    <div class="panel-chevron" style="transition: transform 0.3s; transform: rotate(${panelCollapsed ? 180 : 0}deg);">▼</div>
   `;
   panel.querySelector('.prompt-panel-body').innerHTML = `
     <div style="color: var(--text-secondary); font-style: italic; display: flex; align-items: center; justify-content: center; height: 100%; font-family: var(--font-body);">
@@ -215,6 +223,7 @@ function generatingPromptPanel() {
     <div class="prompt-panel-title">
       <span>✨ Generated Prompt</span>
     </div>
+    <div class="panel-chevron" style="transition: transform 0.3s; transform: rotate(${panelCollapsed ? 180 : 0}deg);">▼</div>
   `;
   panel.querySelector('.prompt-panel-body').innerHTML = `
     <div class="generating-indicator" style="justify-content: center; height: 100%;">
@@ -272,8 +281,8 @@ function renderPromptPanel(s) {
         ${date ? `<span class="pp-date">${date}</span>` : ''}
       </span>
     </div>
+    <div class="panel-chevron" style="transition: transform 0.3s; transform: rotate(${panelCollapsed ? 180 : 0}deg);">▼</div>
   `;
-
   panel.querySelector('.prompt-panel-body').textContent = entry.prompt;
   
   panel.querySelector('.prompt-panel-footer').innerHTML = `
@@ -712,6 +721,22 @@ function bindEvents() {
   });
   document.getElementById('btnTogglePin').addEventListener('click', () => {
     const s = getActiveSession(); if(s) { s.pinned = !s.pinned; saveSessions(); renderSidebar(); renderChat(); }
+  });
+
+  document.getElementById('btnToggleSidebar').addEventListener('click', () => {
+    sidebarCollapsed = !sidebarCollapsed;
+    document.querySelector('.sidebar').classList.toggle('collapsed', sidebarCollapsed);
+  });
+
+  document.getElementById('promptResultPanel').addEventListener('click', (e) => {
+    if (e.target.closest('.prompt-panel-header')) {
+      panelCollapsed = !panelCollapsed;
+      document.getElementById('promptResultPanel').classList.toggle('collapsed', panelCollapsed);
+      const chevron = document.querySelector('.panel-chevron');
+      if (chevron) {
+        chevron.style.transform = `rotate(${panelCollapsed ? 180 : 0}deg)`;
+      }
+    }
   });
 
   // Dock
