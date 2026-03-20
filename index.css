@@ -145,9 +145,9 @@ button.danger:hover { background-color: var(--error-color); color: #fff; }
   border-radius: 10px; padding: 0 6px; font-size: 0.68rem;
   font-weight: 700; line-height: 1.6; flex-shrink: 0;
 }
-.session-actions { display: none; gap: 0.2rem; }
+.session-actions { display: none; gap: 0.4rem; align-items: center; }
 .session-item:hover .session-actions { display: flex; }
-.session-actions .icon-btn { padding: 0.2rem; }
+.session-actions .icon-btn { padding: 0.3rem; }
 
 .sidebar-footer {
   padding: 1rem; border-top: 1px solid var(--border-color);
@@ -166,6 +166,7 @@ button.danger:hover { background-color: var(--error-color); color: #fff; }
   background-color: var(--bg-color);
   position: relative;
   min-width: 0;
+  min-height: 0;
 }
 .chat-header {
   padding: 1rem 1.5rem;
@@ -421,6 +422,7 @@ button.danger:hover { background-color: var(--error-color); color: #fff; }
   display: flex;
   flex-direction: column;
   min-width: 0;
+  min-height: 0;
   background-color: var(--bg-color);
 }
 
@@ -632,15 +634,19 @@ button.danger:hover { background-color: var(--error-color); color: #fff; }
   .sidebar {
     position: absolute;
     top: 0; bottom: 0; left: 0;
-    width: 280px;
+    width: 100%;
     height: 100%;
-    border-right: 1px solid var(--border-color);
+    border-right: none;
     margin-left: 0 !important;
     transform: translateX(0);
+    z-index: 250;
   }
   .sidebar.collapsed {
     transform: translateX(-100%);
   }
+  
+  .session-actions { display: flex !important; }
+  .session-actions .icon-btn { font-size: 1.1rem; padding: 0.5rem; }
 
   .sidebar-header, .sidebar-content, .sidebar-footer {
     padding-left: 1rem;

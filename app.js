@@ -728,6 +728,14 @@ function bindEvents() {
     document.querySelector('.sidebar').classList.toggle('collapsed', sidebarCollapsed);
   });
 
+  const btnCollapseSidebar = document.getElementById('btnCollapseSidebar');
+  if (btnCollapseSidebar) {
+    btnCollapseSidebar.addEventListener('click', () => {
+      sidebarCollapsed = true;
+      document.querySelector('.sidebar').classList.add('collapsed');
+    });
+  }
+
   document.getElementById('promptResultPanel').addEventListener('click', (e) => {
     if (e.target.closest('.prompt-panel-header')) {
       panelCollapsed = !panelCollapsed;
