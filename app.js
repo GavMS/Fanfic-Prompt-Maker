@@ -28,18 +28,25 @@ const THEMES = {
 };
 
 const MODEL_OPTIONS = [
-  { value: 'gemini-2.5-pro',         label: 'gemini-2.5-pro (Most Capable)' },
-  { value: 'gemini-2.5-flash',       label: 'gemini-2.5-flash (Recommended)' },
-  { value: 'gemini-2.5-flash-lite',  label: 'gemini-2.5-flash-lite (Fastest)' },
-  { value: 'gemini-2.0-flash',       label: 'gemini-2.0-flash (Stable)' },
-  { value: 'gemini-2.0-flash-lite',  label: 'gemini-2.0-flash-lite (Stable Fast)' },
-  { value: 'gemini-1.5-pro',         label: 'gemini-1.5-pro (Legacy Pro)' },
-  { value: 'gemini-1.5-flash',       label: 'gemini-1.5-flash (Legacy Flash)' },
+  // --- Newest Gemini 3 Series ---
+  { value: 'gemini-3.1-pro-preview',     label: 'Gemini 3.1 Pro (Most Capable & Smartest)' },
+  { value: 'gemini-3-deep-think',        label: 'Gemini 3 Deep Think (Advanced Reasoning)' },
+  { value: 'gemini-3-flash-preview',     label: 'Gemini 3 Flash (New Default / Recommended)' },
+  { value: 'gemini-3.1-flash-lite-preview', label: 'Gemini 3.1 Flash-Lite (Fastest for Scale)' },
+
+  // --- Gemini 2.5 Series (Stable/Standard) ---
+  { value: 'gemini-2.5-pro',             label: 'Gemini 2.5 Pro (Stable Deep Reasoning)' },
+  { value: 'gemini-2.5-flash',           label: 'Gemini 2.5 Flash (Balanced Speed/Quality)' },
+  { value: 'gemini-2.5-flash-lite',      label: 'Gemini 2.5 Flash-Lite (High Efficiency)' },
+
+  // --- Legacy / Deprecated ---
+  { value: 'gemini-2.0-flash',           label: 'Gemini 2.0 Flash (Legacy - Shutdown June 2026)' },
+  { value: 'gemini-1.5-pro',             label: 'Gemini 1.5 Pro (Legacy)' }
 ];
 
 function defaultSettings() {
   return {
-    theme: 'ao3', customColors: { ...THEMES.ao3 }, model: 'gemini-2.5-flash',
+    theme: 'ao3', customColors: { ...THEMES.ao3 }, model: 'gemini-3-flash-preview',
     styleDirectives: ['onomatopoeia','sensory','internalThinks','paragraphVariety','characterAccuracy','dialogueHeavy','emotionalDepth','continuity'],
     promptLength: 'standard', povMode: 'thirdLimited', toneHints: ''
   };
@@ -702,7 +709,7 @@ function syncSettingsUI() {
 
 function readSettingsUI() {
   const s = ls('fpm_settings', defaultSettings());
-  s.model = document.getElementById('modelSelect')?.value || 'gemini-2.5-flash';
+  s.model = document.getElementById('modelSelect')?.value || 'gemini-3-flash-preview';
   s.toneHints = document.getElementById('toneHintsInput').value.trim();
   s.styleDirectives = Array.from(document.querySelectorAll('input[name="styleDirective"]:checked')).map(c=>c.value);
   s.promptLength = document.querySelector('input[name="promptLength"]:checked')?.value || 'standard';
